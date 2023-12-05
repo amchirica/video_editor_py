@@ -185,7 +185,6 @@ class MainWidget(QWidget):
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -195,13 +194,19 @@ class MainWindow(QMainWindow):
         favicon_path = "favicon.ico"
         self.setWindowIcon(QIcon(favicon_path))
         
+        
         w = 700
-
         h = 500
 
         self.resize(w, h)
 
         main_widget = MainWidget()
+
+        # Create the imp button and set its styles
+        self.imp = QPushButton('Import Video')
+        self.imp.setStyleSheet("QPushButton { width: 100px; height: 50px; background-color: black; color: white; }")
+        self.imp.clicked.connect(main_widget.import_vid)
+        main_widget.layout().addWidget(self.imp)
 
         self.setCentralWidget(main_widget)
 

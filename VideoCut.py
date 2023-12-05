@@ -43,7 +43,6 @@ def extract_audio(video_name, start_time=0, end_time=None):
 
 
 def rotate_video(video_name, start_time=0, end_time=None, degree=0):
-
     clip = VideoFileClip(video_name)
     if not end_time:
         end_time = clip.duration
@@ -56,8 +55,11 @@ def rotate_video(video_name, start_time=0, end_time=None, degree=0):
 
     dot_index = video_name.rfind('.')
     cut_video_name = video_name[: dot_index] + '{}'.format("rotated") + video_name[dot_index:]
-    clip.write_videofile(cut_video_name)
+    
+    # Specify the codec parameter (e.g., 'libx264')
+    clip.write_videofile(cut_video_name, codec='libx264')
     return cut_video_name
+
 
 def fade_in(video_name, duration=1, start_time=0, end_time=None):
     clip = VideoFileClip(video_name)
