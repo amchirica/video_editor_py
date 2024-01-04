@@ -7,6 +7,7 @@ from PyQt5.QtGui import QPainter, QColor, QFont, QBrush, QPalette, QPen, QPolygo
 from PyQt5.QtWidgets import QWidget, QFrame, QScrollArea, QVBoxLayout
 import sys
 import os
+from PyQt5.QtCore import pyqtSignal
 
 from numpy import load
 
@@ -30,7 +31,7 @@ class VideoSample:
 
 
 class QTimeLine(QWidget):
-
+    timeUpdated = pyqtSignal(float)
     positionChanged = pyqtSignal(int)
     selectionChanged = pyqtSignal(VideoSample)
 

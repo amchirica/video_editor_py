@@ -14,9 +14,12 @@ from moviepy.video.fx.fadeout import fadeout
 from moviepy.video.fx.speedx import speedx
 from moviepy.video.fx.resize import  resize
 from moviepy.audio.fx.volumex import volumex
+from moviepy.audio.fx.all import volumex
 from moviepy.video.fx.crop import crop
 import moviepy.editor as mpe
 import moviepy.editor as mpy
+import urllib.parse
+
 
 def cut_video(video_name, start_time=0, end_time=None):
     clip = VideoFileClip(video_name)
@@ -43,21 +46,23 @@ def extract_audio(video_name, start_time=0, end_time=None):
 
 
 def rotate_video(video_name, start_time=0, end_time=None, degree=0):
-
     clip = VideoFileClip(video_name)
     if not end_time:
         end_time = clip.duration
 
     clip1 = clip.subclip(0, start_time)
     clip2 = rotate(clip.subclip(start_time, end_time), degree)
-    clip3 = clip.subclip(end_time)
+    clip3 = clip.subclip(end_time, clip.duration)
     final_clip = concatenate_videoclips([clip1, clip2, clip3])
     clip = final_clip
 
     dot_index = video_name.rfind('.')
     cut_video_name = video_name[: dot_index] + '{}'.format("rotated") + video_name[dot_index:]
-    clip.write_videofile(cut_video_name)
+    
+    # Specify the codec parameter (e.g., 'libx264')
+    clip.write_videofile(cut_video_name, codec='libx264')
     return cut_video_name
+
 
 def fade_in(video_name, duration=1, start_time=0, end_time=None):
     clip = VideoFileClip(video_name)
@@ -131,8 +136,10 @@ def concatenate_video(video_name1, videoSamples, slide_out=False, start_time=0, 
         finalclip = concatenate_videoclips(clips)
 
     dot_index = video_name1.rfind('.')
-    cut_video_name = video_name1[: dot_index] + '{}'.format("concatenated") + video_name1[dot_index:]
-    finalclip.write_videofile(cut_video_name)
+    
+    cut_video_name = video_name1[: dot_index] + "concatenated" + video_name1[dot_index:]
+    print("------------",video_name1)
+    finalclip.write_videofile(cut_video_name, codec="libx264")
     return cut_video_name
 
 def remove_piece_video(video_name, start_time=0, end_time=None):
@@ -142,7 +149,8 @@ def remove_piece_video(video_name, start_time=0, end_time=None):
         end_time = clip.duration
 
     clip1 = clip.subclip(0, start_time)
-    clip3 = clip.subclip(end_time)
+    clip3 = clip.subclip(start_time - end_time)
+
     final_clip = concatenate_videoclips([clip1, clip3])
     clip = final_clip
 
@@ -199,7 +207,7 @@ def remove_audio(video_name, start_time=0, end_time=None):
     new_clip = clip.set_audio(newaudio)
 
     dot_index = video_name.rfind('.')
-    cut_video_name = video_name[: dot_index] + '{}'.format("silent_video") + video_name[dot_index:]
+    cut_video_name = video_name[: dot_index] + '{}'.format("remove_audio") + video_name[dot_index:]
     clip.write_videofile(cut_video_name)
     return cut_video_name
 
@@ -212,7 +220,7 @@ def concatenate_with_audio(video_name, audio_name, start_time=0, end_time=None):
     new_clip = clip.set_audio(background_music)
 
     dot_index = video_name.rfind('.')
-    cut_video_name = video_name[: dot_index] + '{}'.format("loud_video") + video_name[dot_index:]
+    cut_video_name = video_name[: dot_index] + '{}'.format("with_") + video_name[dot_index:]
     new_clip.write_videofile(cut_video_name, codec='libx264',
                      audio_codec='aac',
                      temp_audiofile='temp-audio.m4a',
@@ -240,7 +248,7 @@ def crop_clip(video_name, subwidth=1, subheight=1, start_time=0, end_time=None):
     clip = crop(clip, x1=((clip.w-widt)/2), y1=((clip.h-heigh)/2), x2=(clip.w - ((clip.w-widt)/2)), y2=(clip.h - ((clip.h-heigh)/2)))
 
     dot_index = video_name.rfind('.')
-    cut_video_name = video_name[: dot_index] + '{}'.format("crop_video") + video_name[dot_index:]
+    cut_video_name = video_name[: dot_index] + '{}'.format("optimize_video") + video_name[dot_index:]
     clip.write_videofile(cut_video_name, codec='libx264',
                           audio_codec='aac',
                           temp_audiofile='temp-audio.m4a',
@@ -261,24 +269,9 @@ def brightness(video_name, subwidth=1, subheight=1, start_time=0, end_time=None,
     final_clip = subclip.fx(mpy.vfx.colorx, brightness_factor)
 
     dot_index = video_name.rfind('.')
-    cut_video_name = video_name[:dot_index] + '{}'.format("_brightness") + video_name[dot_index:]
+    cut_video_name = video_name[:dot_index] + '{}'.format("_brightness&contrast") + video_name[dot_index:]
     final_clip.write_videofile(cut_video_name, codec='libx264', audio_codec='aac', temp_audiofile='temp-audio.m4a',
                                remove_temp=True)
     return cut_video_name
 
 
-def contrast(video_name, subwidth=1, subheight=1, start_time=0, end_time=None, contrast_factor=1.0):
-    clip = mpy.VideoFileClip(video_name)
-    if not end_time:
-        end_time = clip.duration
-
-    subclip = clip.subclip(start_time, end_time)
-    subclip = subclip.resize(width=subwidth * clip.w, height=subheight * clip.h)
-
-    final_clip = subclip.fx(mpy.vfx.colorx, contrast_factor)
-
-    dot_index = video_name.rfind('.')
-    cut_video_name = video_name[:dot_index] + '{}'.format("_contrast") + video_name[dot_index:]
-    final_clip.write_videofile(cut_video_name, codec='libx264', audio_codec='aac', temp_audiofile='temp-audio.m4a',
-                               remove_temp=True)
-    return cut_video_name

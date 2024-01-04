@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 from VideoCut import cut_video, extract_audio, rotate_video, fade_in, fade_out, add_text, concatenate_video, \
     change_speed, remove_piece_video, add_photo, change_size, remove_audio, concatenate_with_audio, add_subclip, \
-    crop_clip, brightness, contrast
+    crop_clip, brightness
+
 
 
 class Thread(QThread):
@@ -21,7 +22,6 @@ class Thread(QThread):
     MSG_ADD_VIDEO_VIDEO = 14
     MSG_CROP_VIDEO = 15
     MSG_BRIGHTNESS_VIDEO = 16
-    MSG_CONTRAST_VIDEO = 17
 
 
     signal_return_value = pyqtSignal(int, str)
@@ -33,7 +33,7 @@ class Thread(QThread):
         self.wait()
 
     def set_params(self, msg, video_name, start_time, end_time, rotate_degree=0, duration=0,
-                   text="", fontsize=30, color="black", align="center", x=20, y=190, video_name2=None,
+                   text="", fontsize="", color="", align="", x=50, y=50, video_name2=None,
                    photo_name=None, speed=1, ratiox=1, ratioy=1, slide_out=False, audio_name=None,
                    subwidth=1, subheight=1, videoSamples=None):
         self.videoSamples = videoSamples
@@ -74,12 +74,8 @@ class Thread(QThread):
             subclip_name = fade_out(self.video_name, self.duration, self.start_time, self.end_time)
         elif self.msg == Thread.MSG_EXTRACT_AUDIO:
             subclip_name = extract_audio(self.video_name, self.start_time, self.end_time)
-
-
         elif self.msg == Thread.MSG_ADD_TEXT_VIDEO:
             subclip_name = add_text(self.video_name, self.text, self.fontsize, self.color, self.align, self.start_time, self.end_time)
-
-
         elif self.msg == Thread.MSG_CONCATENATE_VIDEO:
             subclip_name = concatenate_video(self.video_name, self.videoSamples, self.slide_out)
         elif self.msg == Thread.MSG_REMOVE_PIECE_VIDEO:
@@ -88,12 +84,8 @@ class Thread(QThread):
             subclip_name = add_photo(self.video_name, self.photo_name, self.start_time, self.end_time)
         elif self.msg == Thread.MSG_CHANGE_SPEED_VIDEO:
             subclip_name = change_speed(self.video_name, self.speed)
-
-
         elif self.msg == Thread.MSG_RATIO_VIDEO:
             subclip_name = change_size(self.video_name, self.ratioy, self.ratiox)
-
-
         elif self.msg == Thread.MSG_REMOVE_AUDIO_VIDEO:
             subclip_name = remove_audio(self.video_name,  self.start_time, self.end_time)
         elif self.msg == Thread.MSG_CONCATENATE_AUDIO_VIDEO:
@@ -104,6 +96,4 @@ class Thread(QThread):
             subclip_name = crop_clip(self.video_name, self.subwidth, self.subheight, self.end_time)
         elif self.msg == Thread.MSG_BRIGHTNESS_VIDEO:
             subclip_name = brightness(self.video_name, self.subwidth, self.subheight, self.end_time)
-        elif self.msg == Thread.MSG_CONTRAST_VIDEO:
-            subclip_name = contrast(self.video_name, self.subwidth, self.subheight, self.end_time)
         self.signal_return_value.emit(1, subclip_name)

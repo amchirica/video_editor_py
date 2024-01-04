@@ -35,15 +35,15 @@ class Labelik(QtWidgets.QWidget):
         R = QtCore.QRect(QtCore.QPoint(X1, 0), QtCore.QPoint(X2, self.height()))
         painter.fillRect(R, QColor("#000000"))
         for start, end in self._values:
-            x1 = self.get_pos_by_value(start)
+            x1 = int(self.get_pos_by_value(start))
             x2 = self.get_pos_by_value(end)
             r = QtCore.QRect(QtCore.QPoint(x1, 0), QtCore.QPoint(x2, self.height()))
-            painter.fillRect(r, QColor("#00ff00"))
+            painter.fillRect(r, QColor("#2600ff"))
 
     def get_pos_by_value(self, value):
         opt = QtWidgets.QStyleOptionSlider()
         self._slider.initStyleOption(opt)
-        opt.sliderPosition = value
+        opt.sliderPosition = int(value)
         r = self._slider.style().subControlRect(
             QtWidgets.QStyle.CC_Slider,
             opt,
@@ -83,7 +83,7 @@ class VideoWindow(QWidget):
 
 
         self.labellay = QHBoxLayout()
-        self.note = QLabel("Spots")
+        self.note = QLabel("Layer")
         self.labellay.addWidget(self.note, 0)
         self.indices_list = [(0, self.video_duration)]
         self.label = Labelik(self.video_slider)
@@ -110,13 +110,13 @@ class VideoWindow(QWidget):
 
         self.layout_record = QHBoxLayout()
         self.layout_record.setContentsMargins(0, 0, 0, 0)
-        self.button_start = QPushButton('Start')
+        self.button_start = QPushButton('From')
         self.button_start.setStyleSheet("QPushButton"
                                       "{"
                                       "background-color : lightgray;"
                                       "}"
                                       )
-        self.button_end = QPushButton('End')
+        self.button_end = QPushButton('To')
         self.button_end.setStyleSheet("QPushButton"
                                       "{"
                                       "background-color : lightgray;"
@@ -340,16 +340,23 @@ class VideoWindow(QWidget):
 
     def add_text_video(self, wind, text, fontsize, color, align):
         if self._check_duration():
-            self.thread = Thread()
+            try:
+                fontsize1 = int(fontsize)
+            except ValueError:
+                print("Invalid font size. Please enter a valid numerical value.")
+                return
 
-            fontsize1 = int(fontsize)
+            print(f"Adding text: {text}, Font size: {fontsize1}, Color: {color}, Alignment: {align}")
+
+            self.thread = Thread()
             self.thread.set_params(Thread.MSG_ADD_TEXT_VIDEO, self.video_name,
-                                   self.record_start_time / 1000, self.record_end_time / 1000,
-                                   0, 0, text, fontsize1, color,align)
+                                self.record_start_time / 1000, self.record_end_time / 1000,
+                                0, 0, text, fontsize1, color, align)
             self.thread.signal_return_value.connect(self.thread_done)
             self.thread.start()
             self.thread.wait()
             wind.destroy()
+
 
     def concatenate_video(self, wind, videoSamples, slide_out):
         self.thread = Thread()
@@ -454,16 +461,6 @@ class VideoWindow(QWidget):
         self.thread.wait()
         self.destroy()
 
-    def contrast_video(self, w, h):
-        self.thread = Thread()
-        wid = float(w)
-        hei = float(h)
-        self.thread.set_params(Thread.MSG_CONTRAST_VIDEO, self.video_name,
-                            self.record_start_time / 1000, self.record_end_time / 1000, subheight=hei, subwidth=wid)
-        self.thread.signal_return_value.connect(self.thread_done)
-        self.thread.start()
-        self.thread.wait()
-        self.destroy()
 
     def thread_done(self, return_value, video_name):
         if return_value:

@@ -5,7 +5,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QToolBar, QAction, QStatusBar, QCheckBox, QComboBox, \
     QLineEdit, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QStackedLayout, QPushButton, QTabWidget, QDialog, \
     QDialogButtonBox, QMessageBox, QFileDialog, QTextEdit, QFrame, QStyle, QSizePolicy, QSlider, \
-    QListWidget, QListWidgetItem
+    QListWidget, QListWidgetItem, QToolButton, QSizePolicy
 from PyQt5.QtCore import Qt, QSize, QDir, QRect
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from moviepy.editor import VideoFileClip
@@ -20,15 +20,16 @@ from Speed import SpeedWindow
 from Subwindow import SUBWindow
 from VideoCut import *
 from Brightness import BrightnessWindow
-from Contrast import ContrastWindow
 import TimeLine
 from FadeInOut import FadeWindow
 from TimeLine import QTimeLine
 from VideoSelf import VideoWindow
 
 
-class MainWidget(QWidget):
 
+class MainWidget(QWidget):
+    
+    
     def __init__(self, *args, **kwargs):
         super(MainWidget, self).__init__(*args, **kwargs)
         main_layout = QVBoxLayout()
@@ -48,6 +49,15 @@ class MainWidget(QWidget):
         self.VideoPlay = VideoWindow()
         layout3.addWidget(self.VideoPlay)
 
+        # Adaugă o etichetă pentru informații despre videoclip
+        self.video_info_label = QLabel("Video: None\nDuration: 0 seconds\nResolution: N/A\nCodec: N/A")
+        layout1.addWidget(self.video_info_label)
+
+
+        layout3 = QVBoxLayout()
+        self.VideoPlay = VideoWindow()
+        layout3.addWidget(self.VideoPlay)
+
         self.imp = QPushButton('Import Video')
         self.imp.clicked.connect(self.import_vid)
         layout1.addWidget(self.imp)
@@ -56,11 +66,11 @@ class MainWidget(QWidget):
         self.add_photo.clicked.connect(lambda: AddPhotoWindow(self.VideoPlay, 200, 100).show())
         layout1.addWidget(self.add_photo)
 
-        self.cut = QPushButton('Cut')
+        self.cut = QPushButton('Cut Fragment')
         self.cut.clicked.connect(lambda: self.VideoPlay.record_subclip_video())
         layout1.addWidget(self.cut)
 
-        self.remove = QPushButton('Remove Video Piece')
+        self.remove = QPushButton('Remove Fragment')
         self.remove.clicked.connect(lambda: self.VideoPlay.remove_piece_video())
         layout1.addWidget(self.remove)
 
@@ -73,8 +83,7 @@ class MainWidget(QWidget):
         layout1.addWidget(self.subvid)
 
         self.concatenate = QPushButton('Concatenate')
-        self.concatenate.clicked.connect(lambda: self.show_sub_window(ConcatenateWindow(self.VideoPlay, 200, 100,
-                                                                                        self.videoSamples)))
+        self.concatenate.clicked.connect(lambda: self.show_sub_window(ConcatenateWindow(self.VideoPlay, 200, 100, self.videoSamples)))
         layout1.addWidget(self.concatenate)
 
         self.fade = QPushButton('Fade in/Fade out')
@@ -93,30 +102,26 @@ class MainWidget(QWidget):
         self.add_text.clicked.connect(lambda: self.show_sub_window(AddTextWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.add_text)
 
-        self.audi = QPushButton('Extract Audio')
-        self.audi.clicked.connect(lambda: self.VideoPlay.record_subclip_audio())
-        layout1.addWidget(self.audi)
-
-        self.silentvid = QPushButton('Extract Video Without Audio')
-        self.silentvid.clicked.connect(lambda: self.VideoPlay.remove_audio())
-        layout1.addWidget(self.silentvid)
-
-        self.audadd = QPushButton('Concatenate with Audio')
+        self.audadd = QPushButton('Replace Audio')
         self.audadd.clicked.connect(lambda: self.show_sub_window(AudioWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.audadd)
 
-        self.crop = QPushButton('Crop Video')
+        self.crop = QPushButton('Optimize Resolution')
         self.crop.clicked.connect(lambda: self.show_sub_window(CropWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.crop)
 
-        self.brightness = QPushButton('Brightness')
+        self.brightness = QPushButton('Brightness and Contrast')
         self.brightness.clicked.connect(lambda: self.show_sub_window(BrightnessWindow(self.VideoPlay)))
         layout1.addWidget(self.brightness)
 
+        self.audi = QPushButton('Export Audio Wihtout Video')
+        self.audi.clicked.connect(lambda: self.VideoPlay.record_subclip_audio())
+        layout1.addWidget(self.audi)
 
-        self.contrast = QPushButton('Contrast')
-        self.contrast.clicked.connect(lambda: self.show_sub_window(ContrastWindow(self.VideoPlay, 200, 100)))
-        layout1.addWidget(self.contrast)
+        self.silentvid = QPushButton('Export Video Without Audio')
+        self.silentvid.clicked.connect(lambda: self.VideoPlay.remove_audio())
+        layout1.addWidget(self.silentvid)
+
 
         layout1.addStretch()
 
@@ -134,7 +139,7 @@ class MainWidget(QWidget):
 
     def import_vid(self, file_name=None):
         if not file_name:
-            file_name, _ = QFileDialog.getOpenFileName(self, 'Open Video', '', 'Video files (*.mp4 *.MP4 *.avi *.mov)')
+            file_name, _ = QFileDialog.getOpenFileName(self, 'Open Video', '', 'Video files (*.mp4 *.MP4 *.avi *.mov *.mp3)')
         if file_name != '':
             clip = VideoFileClip(file_name)
             dot_index = file_name.rfind('.')
@@ -161,6 +166,16 @@ class MainWidget(QWidget):
             self.clipchik = TimeLine.VideoSample(clip.duration)
             self.time_l.videoSamples.append(self.clipchik)
 
+            # Afișează informații despre videoclip în eticheta video_info_label
+            video_info = (
+                f"Video: {file_name}\n"
+                f"Duration: {clip.duration} seconds\n"
+                f"Resolution: {clip.size}\n"
+                f"Codec: {clip.fps}\n"
+            )
+            self.video_info_label.setText(video_info)
+
+
     def playSelectedItem(self, event, filename):
         self.VideoPlay.openFile(filename)
         self.VideoPlay.video_name = filename
@@ -185,7 +200,6 @@ class MainWidget(QWidget):
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -195,13 +209,19 @@ class MainWindow(QMainWindow):
         favicon_path = "favicon.ico"
         self.setWindowIcon(QIcon(favicon_path))
         
+        
         w = 700
-
         h = 500
 
         self.resize(w, h)
 
         main_widget = MainWidget()
+
+        # Create the imp button and set its styles
+        self.imp = QPushButton('Import Video')
+        self.imp.setStyleSheet("QPushButton { width: 100px; height: 50px; background-color: red; color: white; }")
+        self.imp.clicked.connect(main_widget.import_vid)
+        main_widget.layout().addWidget(self.imp)
 
         self.setCentralWidget(main_widget)
 

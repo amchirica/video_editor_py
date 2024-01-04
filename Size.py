@@ -1,14 +1,9 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, \
     QComboBox, QFileDialog, QLineEdit, QSlider
-
 import sys
-
 from random import randint
-
 from moviepy.video.io.VideoFileClip import VideoFileClip
-
 from VideoSelf import VideoWindow
-
 from PyQt5.QtCore import Qt
 
 
