@@ -35,7 +35,7 @@ class Thread(QThread):
     def set_params(self, msg, video_name, start_time, end_time, rotate_degree=0, duration=0,
                    text="", fontsize="", color="", align="", x=50, y=50, video_name2=None,
                    photo_name=None, speed=1, ratiox=1, ratioy=1, slide_out=False, audio_name=None,
-                   subwidth=1, subheight=1, videoSamples=None):
+                   subwidth=1, subheight=1, videoSamples=None, brightness_factor=1.0):
         self.videoSamples = videoSamples
         self.subwidth = subwidth
         self.subheight = subheight
@@ -58,6 +58,7 @@ class Thread(QThread):
         self.end_time = end_time
         self.rotate_degree = int(rotate_degree)
         self.duration = int(duration)
+        self.brightness_factor = brightness_factor
 
     def run(self):
         global subclip_name
@@ -95,5 +96,5 @@ class Thread(QThread):
         elif self.msg == Thread.MSG_CROP_VIDEO:
             subclip_name = crop_clip(self.video_name, self.subwidth, self.subheight, self.end_time)
         elif self.msg == Thread.MSG_BRIGHTNESS_VIDEO:
-            subclip_name = brightness(self.video_name, self.subwidth, self.subheight, self.end_time)
+            subclip_name = brightness(self.video_name, end_time=self.end_time, brightness_factor=self.brightness_factor)
         self.signal_return_value.emit(1, subclip_name)

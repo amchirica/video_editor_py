@@ -51,9 +51,9 @@ def rotate_video(video_name, start_time=0, end_time=None, degree=0):
         end_time = clip.duration
 
     clip1 = clip.subclip(0, start_time)
-    clip2 = rotate(clip.subclip(start_time, end_time), degree)
-    clip3 = clip.subclip(end_time, clip.duration)
-    final_clip = concatenate_videoclips([clip1, clip2, clip3])
+    clip2 = clip.subclip(start_time, end_time).rotate(degree)
+    # clip3 = clip.subclip(end_time, clip.duration)
+    final_clip = concatenate_videoclips([clip1, clip2])
     clip = final_clip
 
     dot_index = video_name.rfind('.')
@@ -220,7 +220,7 @@ def concatenate_with_audio(video_name, audio_name, start_time=0, end_time=None):
     new_clip = clip.set_audio(background_music)
 
     dot_index = video_name.rfind('.')
-    cut_video_name = video_name[: dot_index] + '{}'.format("with_") + video_name[dot_index:]
+    cut_video_name = video_name[: dot_index] + '{}'.format("concatenate_audio") + video_name[dot_index:]
     new_clip.write_videofile(cut_video_name, codec='libx264',
                      audio_codec='aac',
                      temp_audiofile='temp-audio.m4a',
@@ -255,17 +255,15 @@ def crop_clip(video_name, subwidth=1, subheight=1, start_time=0, end_time=None):
                           remove_temp=True)
     return cut_video_name
 
-def brightness(video_name, subwidth=1, subheight=1, start_time=0, end_time=None, brightness_factor=1.0):
-    if subwidth <= 1 or subheight <= 1:
-        raise ValueError("Subwidth and subheight must be positive values.")
+def brightness(video_name, start_time=0, end_time=None, brightness_factor=1.0):
      
     clip = mpy.VideoFileClip(video_name)
     if not end_time:
         end_time = clip.duration
 
     subclip = clip.subclip(start_time, end_time)
-    subclip = subclip.resize(width=subwidth * clip.w, height=subheight * clip.h)
-
+    # subclip = subclip.resize(width=subwidth * clip.w, height=subheight * clip.h)
+    print(brightness_factor)
     final_clip = subclip.fx(mpy.vfx.colorx, brightness_factor)
 
     dot_index = video_name.rfind('.')

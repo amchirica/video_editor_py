@@ -1,6 +1,5 @@
 import tempfile
 from base64 import b64encode
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import Qt, QPoint, QLine, QRect, QRectF, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QFont, QBrush, QPalette, QPen, QPolygon, QPainterPath, QPixmap
@@ -8,8 +7,11 @@ from PyQt5.QtWidgets import QWidget, QFrame, QScrollArea, QVBoxLayout
 import sys
 import os
 from PyQt5.QtCore import pyqtSignal
-
 from numpy import load
+import subprocess
+from PyQt5.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QApplication, QPushButton
+from PyQt5.QtWidgets import QFileDialog
+
 
 __textColor__ = QColor(187, 100, 70)
 __backgroudColor__ = QColor(60, 63, 65)
@@ -235,3 +237,51 @@ class QTimeLine(QWidget):
     # Set Font
     def setTextFont(self, font):
         self.font = font
+
+
+class VideoRenderingTerminal(QWidget):
+    def __init__(self, parent=None):
+        super(VideoRenderingTerminal, self).__init__(parent)
+
+        self.terminal_output = QTextEdit(self)
+        self.terminal_output.setReadOnly(True)
+
+        self.render_button = QPushButton("Render Video", self)
+        self.render_button.clicked.connect(self.start_rendering)
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.terminal_output)
+        layout.addWidget(self.render_button)
+
+    def start_rendering(self):
+    # Deschide fereastra de dialog pentru export
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_name, _ = QFileDialog.getSaveFileName(self, "Export Video", "", "Video Files (*.mp4);;All Files (*)", options=options)
+
+        if file_name:
+            # Actualizează comanda de randare cu calea selectată
+            render_command = f"python path_to_your_render_script.py --output {file_name}"
+
+            process = subprocess.Popen(render_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            output, _ = process.communicate()
+
+        # Afisează output-ul în terminal
+        self.terminal_output.append(output.strip())
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                self.terminal_output.append(output.strip())
+                QApplication.processEvents()  # Asigură-te că ai această linie
+
+                process.communicate()
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    terminal_widget = VideoRenderingTerminal()
+    terminal_widget.show()
+    sys.exit(app.exec_())

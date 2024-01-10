@@ -37,7 +37,7 @@ class AddTextWindow(QWidget):
 
         self.note = QLabel("Pos:")
         self.align = QComboBox()
-        places = ['center', 'est', 'vest', 'sud', 'nord']
+        places = ['center', 'east', 'west', 'south', 'north']
         self.align.addItems(places)
         self.poslayout.addWidget(self.note)
         self.poslayout.addWidget(self.align)

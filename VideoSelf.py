@@ -444,22 +444,20 @@ class VideoWindow(QWidget):
         self.thread.wait()
         wind.destroy()
 
-    def change_brightness_video(self, w, h):
+    def change_brightness_video(self, wind, b_factor):
         if self.record_start_time is None or self.record_end_time is None:
             # Verificăm dacă valorile sunt None și gestionăm cazul corespunzător
             print("Eroare: Timpul de început sau timpul de încheiere nu au fost setate.")
             return
 
         self.thread = Thread()
-        wid = float(w)
-        hei = float(h)
         start_time = float(self.record_start_time) / 1000
         end_time = float(self.record_end_time) / 1000
-        self.thread.set_params(Thread.MSG_BRIGHTNESS_VIDEO, self.video_name, start_time, end_time, subheight=hei, subwidth=wid)
+        self.thread.set_params(Thread.MSG_BRIGHTNESS_VIDEO, self.video_name, start_time, end_time, brightness_factor=b_factor)
         self.thread.signal_return_value.connect(self.thread_done)
         self.thread.start()
         self.thread.wait()
-        self.destroy()
+        wind.destroy()
 
 
     def thread_done(self, return_value, video_name):

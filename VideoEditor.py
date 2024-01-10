@@ -102,7 +102,7 @@ class MainWidget(QWidget):
         self.add_text.clicked.connect(lambda: self.show_sub_window(AddTextWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.add_text)
 
-        self.audadd = QPushButton('Replace Audio')
+        self.audadd = QPushButton('Import/Rewrite Audio')
         self.audadd.clicked.connect(lambda: self.show_sub_window(AudioWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.audadd)
 
@@ -111,7 +111,7 @@ class MainWidget(QWidget):
         layout1.addWidget(self.crop)
 
         self.brightness = QPushButton('Brightness and Contrast')
-        self.brightness.clicked.connect(lambda: self.show_sub_window(BrightnessWindow(self.VideoPlay)))
+        self.brightness.clicked.connect(lambda: self.show_sub_window(BrightnessWindow(self.VideoPlay, 200, 100)))
         layout1.addWidget(self.brightness)
 
         self.audi = QPushButton('Export Audio Wihtout Video')
