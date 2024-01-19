@@ -102,7 +102,7 @@ class VideoWindow(QWidget):
         self.errorLabel.setSizePolicy(QSizePolicy.Preferred,
                 QSizePolicy.Maximum)
 
-        # Create layouts to place inside widget
+        #Crează layout-ul pentru a adauga in interiorul widget-ului
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
         controlLayout.addWidget(self.playButton)
@@ -136,7 +136,7 @@ class VideoWindow(QWidget):
         layout.addLayout(controlLayout, 1)
         layout.addWidget(self.errorLabel,1)
 
-        # Set widget to contain window contents
+        #Setează widget-ul pentru conținutull ferestrei
         self.setLayout(layout)
 
         self.video_player.setVideoOutput(videoWidget)

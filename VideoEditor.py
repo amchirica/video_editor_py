@@ -24,6 +24,7 @@ import TimeLine
 from FadeInOut import FadeWindow
 from TimeLine import QTimeLine
 from VideoSelf import VideoWindow
+from ExportTerminal import ExportTerminal
 
 
 
@@ -121,6 +122,10 @@ class MainWidget(QWidget):
         self.silentvid = QPushButton('Export Video Without Audio')
         self.silentvid.clicked.connect(lambda: self.VideoPlay.remove_audio())
         layout1.addWidget(self.silentvid)
+        
+        self.export_terminal = ExportTerminal(self)
+        layout.addWidget(self.export_terminal)
+
 
 
         layout1.addStretch()
@@ -186,7 +191,8 @@ class MainWidget(QWidget):
             self.VideoPlay.video_duration = clip.duration
             self.VideoPlay.indices_list = [(0, clip.duration)]
         for v in self.icons:
-            v.setStyleSheet("border: 0px solid blue;")
+            if v in self.icons:
+                v.setStyleSheet("border: 0px solid blue;")
         self.videoSamples.clear()
         self.icons.clear()
 
@@ -194,6 +200,21 @@ class MainWidget(QWidget):
         self.videoSamples.append(filename)
         self.icons.append(label)
         label.setStyleSheet("border: 3px solid blue;")
+        
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            self.delete_last_clip()
+
+    def delete_last_clip(self):
+        if self.videoSamples:
+            # Ia ultimul element din lista și șterge-l
+            last_clip = self.videoSamples.pop()
+            last_icon = self.icons.pop()
+
+            # Șterge QLabel din layout
+            layout = self.layout()
+            layout.removeWidget(last_icon)
+            last_icon.deleteLater()
 
     def show_sub_window(self, window):
         window.show()
@@ -205,7 +226,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("VideoPy")
 
-        # Add a favicon
+        # Adauga favicon
         favicon_path = "favicon.ico"
         self.setWindowIcon(QIcon(favicon_path))
         
@@ -217,7 +238,7 @@ class MainWindow(QMainWindow):
 
         main_widget = MainWidget()
 
-        # Create the imp button and set its styles
+        #Crează un buton de imp si seteaza stilul
         self.imp = QPushButton('Import Video')
         self.imp.setStyleSheet("QPushButton { width: 100px; height: 50px; background-color: red; color: white; }")
         self.imp.clicked.connect(main_widget.import_vid)

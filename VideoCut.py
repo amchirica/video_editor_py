@@ -20,6 +20,7 @@ import moviepy.editor as mpe
 import moviepy.editor as mpy
 import urllib.parse
 
+#Definim doate funcțiile pentru a putea să exportam fisierele de tip video
 
 def cut_video(video_name, start_time=0, end_time=None):
     clip = VideoFileClip(video_name)
@@ -59,7 +60,7 @@ def rotate_video(video_name, start_time=0, end_time=None, degree=0):
     dot_index = video_name.rfind('.')
     cut_video_name = video_name[: dot_index] + '{}'.format("rotated") + video_name[dot_index:]
     
-    # Specify the codec parameter (e.g., 'libx264')
+    # Specificăm codecul (e.g., 'libx264')
     clip.write_videofile(cut_video_name, codec='libx264')
     return cut_video_name
 
@@ -273,3 +274,25 @@ def brightness(video_name, start_time=0, end_time=None, brightness_factor=1.0):
     return cut_video_name
 
 
+def export_video(self):
+    # Deschide fereastra de dialog pentru selectarea fișierului video
+    options = QFileDialog.Options()
+    options |= QFileDialog.DontUseNativeDialog
+    file_name, _ = QFileDialog.getSaveFileName(self, "Export Video", "", "Video Files (*.mp4);;All Files (*)", options=options)
+
+    if file_name:
+        try:
+            # Calea către videoclipul original
+            original_video_path = self.selected_file_path
+
+            # Aici poți utiliza funcția de concatenare cu sunetul dorită
+            concatenated_video_name = concatenate_with_audio(original_video_path, "cale_spre_sunet.mp3", start_time=0, end_time=None)
+
+            # Salvează clipul final
+            concatenated_video = VideoFileClip(concatenated_video_name)
+            concatenated_video.write_videofile(file_name, codec="libx264", audio_codec="aac")
+
+            self.terminal_output.append(f"Export successful. Video saved at: {file_name}")
+        except Exception as e:
+            # În caz de eroare, afișează mesajul în terminal
+            self.terminal_output.append(f"Export failed. Error: {str(e)}")

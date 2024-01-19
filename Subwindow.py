@@ -1,13 +1,11 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, \
     QComboBox, QFileDialog, QRadioButton
-
 import sys
-
 from random import randint
-
 from moviepy.video.io.VideoFileClip import VideoFileClip
-
 from VideoSelf import VideoWindow
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog
+from ExportTerminal import ExportTerminal
 
 
 class SUBWindow(QWidget):
@@ -25,6 +23,7 @@ class SUBWindow(QWidget):
         self.layout = QVBoxLayout()
         self.concat = QPushButton('Import Second Video')
         self.done = QPushButton("Add Subvideo")
+        self.export_terminal = ExportTerminal()
 
         self.layout.addWidget(self.concat)
         self.layout.addWidget(self.done)

@@ -42,7 +42,7 @@ class QTimeLine(QWidget):
         self.duration = duration
         self.length = length
 
-        # Set variables
+        # Setarea variabilelor
         self.backgroundColor = __backgroudColor__
         self.textColor = __textColor__
         self.font = __font__
@@ -64,7 +64,7 @@ class QTimeLine(QWidget):
         self.setGeometry(300, 300, self.length, 200)
         self.setWindowTitle("TESTE")
 
-        # Set Background
+        # Setăm fundalul
         pal = QPalette()
         pal.setColor(QPalette.Background, self.backgroundColor)
         self.setPalette(pal)
@@ -141,7 +141,7 @@ class QTimeLine(QWidget):
                     qp.drawPixmap(QRect(t / scale, 52.5, sample.duration/scale, 45), pic)
             t += sample.duration
 
-        # Clear clip path
+        # Curață calea clipului
         path = QPainterPath()
         path.addRect(self.rect().x(), self.rect().y(), self.rect().width(), self.rect().height())
         qp.setClipPath(path)
